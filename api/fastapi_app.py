@@ -1,11 +1,13 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
 from pathlib import Path
 
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from models.model_manager import ModelManager
 from pydantic import BaseModel
-from fastapi.responses import JSONResponse
+
+from models.model_manager import ModelManager
+
 
 app = FastAPI(
     title="Model-Mesh API",
@@ -15,6 +17,14 @@ app = FastAPI(
     redoc_url=None     # Disabling ReDoc for clean minimalism
 )
 
+# Allow CORS for all origins (for development purposes)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can restrict this to specific origins in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount the 'static' directory for serving static files like images, CSS, and HTML
 app.mount("/static", StaticFiles(directory="static"), name="static")
