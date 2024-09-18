@@ -21,7 +21,6 @@ dist/
 
 # Logs
 *.log
-*.txt
 
 # IDEs and editors
 .vscode/
