@@ -1,4 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
+from pathlib import Path
+
+from fastapi.staticfiles import StaticFiles
 from models.model_manager import ModelManager
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
@@ -10,6 +14,15 @@ app = FastAPI(
     docs_url="/docs",  # Swagger
     redoc_url=None     # Disabling ReDoc for clean minimalism
 )
+
+
+# Mount the 'static' directory for serving static files like images, CSS, and HTML
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/", response_class=HTMLResponse)
+async def serve_frontend():
+    file_path = Path(__file__).parent.parent / "static/index.html"
+    return HTMLResponse(content=file_path.read_text(), status_code=200)
 
 # Initialize the model manager
 model_manager = ModelManager()
