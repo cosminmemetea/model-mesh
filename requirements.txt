@@ -2,3 +2,4 @@ torch
 transformers
 fastapi
 uvicorn
+httpx

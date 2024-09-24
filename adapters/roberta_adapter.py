@@ -30,8 +30,6 @@ class RoBertaAdapter(ModelAdapter):
 
         # Return the result in the desired format
         return {
-            "result": {
                 "label": label,
                 "score": score
-            }
         }
