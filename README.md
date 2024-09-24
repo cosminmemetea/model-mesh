@@ -31,6 +31,12 @@ The application is deployed as a web service on Render: [Model-Mesh on Render](h
    ```
    docker build -t model-mesh:latest . 
    ```
+
+   For easy build and redeployment in the docker container:
+   
+   ```
+   docker-compose up --build modelmesh
+   ```
 3. **Run the Docker Container**:
 
    Run the container on port 5050 (or one of your choice, but make sure you update docker related files and app.py):
@@ -38,6 +44,7 @@ The application is deployed as a web service on Render: [Model-Mesh on Render](h
    ```
    docker run -d -p 5050:5050 model-mesh:latest
    ```
+
 4. **Access the Application**:
 
     API (FastAPI): Once the container is running, you can access the FastAPI Swagger UI at:

@@ -1,0 +1,13 @@
+services:
+  modelmesh:
+    build: .
+    container_name: model-mesh-api
+    ports:
+      - "5050:5050"  # Expose the FastAPI app on port 5050
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5050/health"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+
