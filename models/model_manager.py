@@ -1,7 +1,6 @@
 # models/model_manager.py
 from adapters.bert_adapter import BertAdapter
 from adapters.distilbert_adapter import DistilBertAdapter
-from adapters.gpt_adapter import GPTAdapter
 from adapters.roberta_adapter import RoBertaAdapter
 
 class ModelManager:
