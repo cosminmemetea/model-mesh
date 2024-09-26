@@ -31,3 +31,4 @@ dist/
 # System-specific
 .DS_Store
 Thumbs.db
+s3-access-key.csv
