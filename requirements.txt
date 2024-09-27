@@ -3,3 +3,7 @@ transformers
 fastapi
 uvicorn
 httpx
+transformers   # For loading models via Hugging Face
+scikit-learn   # For evaluation metrics like accuracy, F1, etc.
+pandas          # For data handling (CSV data loader)
+requests     # For API requests if you later implement API data loaders

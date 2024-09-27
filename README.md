@@ -167,3 +167,64 @@ Add the following DVC files to Git after every change:
    git push
    ```
 Never commit large datasets directly to Git; always use DVC to track them.
+
+## 7. Sentiment Analysis Datasets
+
+Below are the datasets used for this project:
+
+- **Sentiment140** (Twitter data)
+  - **Description**: A dataset of 1.6 million tweets labeled with sentiment (positive, negative, neutral).
+  - **Source**: [Sentiment140 Dataset](http://help.sentiment140.com/for-students/)
+  
+- **IMDb Movie Reviews**
+  - **Description**: 50,000 highly polarized movie reviews labeled with positive and negative sentiments.
+  - **Source**: [IMDb Movie Reviews Dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews)
+
+- **Amazon Product Reviews**
+  - **Description**: Millions of Amazon product reviews labeled with positive/negative sentiments.
+  - **Source**: [Amazon Product Reviews](https://www.kaggle.com/datasets/bittlingmayer/amazonreviews)
+
+- **Yelp Reviews**
+  - **Description**: Reviews from Yelp labeled with positive and negative sentiments.
+  - **Source**: [Yelp Reviews Dataset](https://www.kaggle.com/datasets/yelp-dataset/yelp-dataset)
+
+### 8. Kaggle Setup
+
+To download datasets from Kaggle, you will need to set up the Kaggle API on your machine.
+
+#### Step 1: Install Kaggle API
+
+Install the Kaggle API using pip:
+
+\`\`\`bash
+pip install kaggle
+\`\`\`
+
+#### Step 2: Authenticate with Kaggle
+
+1. Go to your [Kaggle Account Settings](https://www.kaggle.com/account).
+2. Under **API**, click on **Create New API Token** to download a `kaggle.json` file.
+3. Move `kaggle.json` to the appropriate directory:
+   - **On macOS/Linux**:
+     \`\`\`bash
+     mkdir -p ~/.kaggle
+     mv ~/Downloads/kaggle.json ~/.kaggle/
+     chmod 600 ~/.kaggle/kaggle.json
+     \`\`\`
+   - **On Windows**: Place it in `C:\Users\<YourUsername>\.kaggle\kaggle.json`.
+
+#### Step 3: Download Datasets with Kaggle API
+
+After the Kaggle API is configured, you can download datasets using the following commands:
+
+- **IMDb Movie Reviews**:
+   \`\`\`bash
+   kaggle datasets download -d lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
+   unzip imdb-dataset-of-50k-movie-reviews.zip -d data/raw/
+   \`\`\`
+
+- **Amazon Reviews**:
+   \`\`\`bash
+   kaggle datasets download -d bittlingmayer/amazonreviews
+   unzip amazonreviews.zip -d data/raw/
+   \`\`\`
