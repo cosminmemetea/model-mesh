@@ -196,9 +196,9 @@ To download datasets from Kaggle, you will need to set up the Kaggle API on your
 
 Install the Kaggle API using pip:
 
-\`\`\`bash
+```
 pip install kaggle
-\`\`\`
+```
 
 #### Step 2: Authenticate with Kaggle
 
@@ -206,11 +206,11 @@ pip install kaggle
 2. Under **API**, click on **Create New API Token** to download a `kaggle.json` file.
 3. Move `kaggle.json` to the appropriate directory:
    - **On macOS/Linux**:
-     \`\`\`bash
+     ```
      mkdir -p ~/.kaggle
      mv ~/Downloads/kaggle.json ~/.kaggle/
      chmod 600 ~/.kaggle/kaggle.json
-     \`\`\`
+     ```
    - **On Windows**: Place it in `C:\Users\<YourUsername>\.kaggle\kaggle.json`.
 
 #### Step 3: Download Datasets with Kaggle API
@@ -218,13 +218,13 @@ pip install kaggle
 After the Kaggle API is configured, you can download datasets using the following commands:
 
 - **IMDb Movie Reviews**:
-   \`\`\`bash
+   ```
    kaggle datasets download -d lakshmi25npathi/imdb-dataset-of-50k-movie-reviews
    unzip imdb-dataset-of-50k-movie-reviews.zip -d data/raw/
-   \`\`\`
+   ```
 
 - **Amazon Reviews**:
-   \`\`\`bash
+   ```
    kaggle datasets download -d bittlingmayer/amazonreviews
    unzip amazonreviews.zip -d data/raw/
-   \`\`\`
+   ```
