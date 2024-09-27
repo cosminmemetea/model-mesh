@@ -150,3 +150,20 @@ Before starting, ensure you have the following installed:
     ```
     dvc remote list
     ```
+
+##  5. DVC Files and S3
+DVC tracks files by their MD5 hashes for efficient version control. When pushing to S3, files will appear as hashed filenames (e.g., md5/hex/hash), which are mapped to the original filenames in your Git repository. This ensures that no duplicate files are stored and changes are versioned.
+
+## 6. Data Versioning and Sharing
+When collaborators clone this repository, they can pull the necessary data using DVC. After setting up DVC and configuring the S3 remote, run:
+   ```
+   dvc pull
+   ```
+To version control new data, add the files using dvc add and then commit the changes in Git. Push the updated .dvc files to the repository, and use dvc push to sync the data to S3.
+Add the following DVC files to Git after every change:
+   ```
+   git add data/.gitignore data/raw.dvc data/processed.dvc
+   git commit -m "Tracked new data with DVC"
+   git push
+   ```
+Never commit large datasets directly to Git; always use DVC to track them.
