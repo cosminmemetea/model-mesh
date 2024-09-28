@@ -38,7 +38,7 @@ The application is deployed as a web service on Render: [Model-Mesh on Render](h
    For easy build and redeployment in the docker container:
    
    ```
-   docker-compose up --build modelmesh
+   docker compose up --build modelmesh
    ```
 3. **Run the Docker Container**:
 

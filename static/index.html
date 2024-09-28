@@ -8,6 +8,7 @@
     <title>Mood Checker - Groovy Vibes!</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Press+Start+2P&display=swap');
+        
         @media only screen and (max-width: 600px) {
             h1 {
                 font-size: 1.5rem;
@@ -23,11 +24,17 @@
             .result {
                 font-size: 18px;
             }
+            .wizard {
+                font-size: 14px;
+                padding: 5px;
+            }
         }
+
         body {
             font-family: 'Pacifico', cursive;
-            background: linear-gradient(135deg, #f0f4f8, #e0f7fa); /* Soft pastel gradient */
+            background: linear-gradient(135deg, #f0f4f8, #e0f7fa);
             background-image: url('/static/background-gradient.webp');
+            background-color: #c1f4f6;
             color: #3a3d3d;
             display: flex;
             justify-content: center;
@@ -38,18 +45,18 @@
             flex-direction: column;
             background-size: cover;
         }
+
         h1 {
             color: #ff69b4;
             font-family: 'Press Start 2P', cursive;
             text-shadow: 3px 3px #ffd700;
             font-size: 2.5rem;
         }
-        h1, input, button, .result, footer {
-            text-align: center; /* Ensure individual elements are centered */
-        }
+
         .input-container {
             margin-bottom: 20px;
         }
+
         input {
             padding: 12px;
             font-size: 18px;
@@ -60,6 +67,7 @@
             color: #3a3d3d;
             text-align: center;
         }
+
         button {
             padding: 12px 24px;
             background-color: #ff4500;
@@ -70,9 +78,16 @@
             cursor: pointer;
             font-family: 'Pacifico', cursive;
         }
+
+        button:disabled {
+            background-color: #d3d3d3;
+            cursor: not-allowed;
+        }
+
         button:hover {
             background-color: #ff6347;
         }
+
         .result {
             margin-top: 25px;
             font-size: 20px;
@@ -82,10 +97,49 @@
             border-radius: 20px;
             border: 3px solid #daa520;
         }
+
+        .wizard-container {
+            margin-top: 20px;
+        }
+
+        .wizard {
+            padding: 10px;
+            background-color: #7fffd4;
+            border: 2px solid #20b2aa;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 5px;
+            display: inline-block;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .wizard:hover {
+            background-color: #40e0d0;
+        }
+
+        .wizard-selected {
+            background-color: #ff6347; /* More distinctive color */
+            border-color: #ff4500;
+            color: white;
+        }
+
+        .wizard-disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
         footer {
             margin-top: 50px;
             font-size: 14px;
             color: #8b008b;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #ff69b4;
         }
     </style>
 </head>
@@ -96,8 +150,16 @@
     <div class="input-container">
         <input type="text" id="user-input" placeholder="What's your vibe today?" />
     </div>
+
+    <div class="wizard-container">
+        <div class="wizard" id="bert-wizard" onclick="chooseWizard('bert')">🧙🏻 BERT Wizard</div>
+        <div class="wizard" id="roberta-wizard" onclick="chooseWizard('roberta')">🧙‍♀️ RoBERTa Wizard</div>
+        <div class="wizard" id="distilbert-wizard" onclick="chooseWizard('distilbert')">🧙🏿‍♂️ DistilBERT Wizard</div>
+    </div>
+
+    <button id="check-vibe-button" onclick="checkMood()">Check My Vibe!</button>
     
-    <button onclick="checkMood()">Check My Vibe!</button>
+    <div class="loading-spinner" id="loading-spinner">⏳ Checking your vibe...</div>
     
     <div class="result" id="result-container"></div>
 
@@ -106,13 +168,37 @@
     </footer>
 
     <script>
+        let selectedModel = "bert";  // Default model is BERT
+
+        function chooseWizard(model) {
+            selectedModel = model;
+            document.querySelectorAll('.wizard').forEach(el => {
+                el.classList.remove('wizard-selected');  // Reset all wizards
+            });
+            document.getElementById(`${model}-wizard`).classList.add('wizard-selected');  // Highlight selected wizard
+        }
+
         async function checkMood() {
             const userInput = document.getElementById('user-input').value;
             const resultContainer = document.getElementById('result-container');
-            
+            const button = document.getElementById('check-vibe-button');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const inputField = document.getElementById('user-input');
+            const wizards = document.querySelectorAll('.wizard');
+
+            // Disable interactions during prediction
+            button.disabled = true;
+            inputField.disabled = true;
+            wizards.forEach(el => el.classList.add('wizard-disabled'));
+            loadingSpinner.style.display = 'block';
+
             // If input is empty, show a fun message
             if (!userInput) {
                 resultContainer.innerHTML = "☮️ Yo, share your vibe with me! ☮️";
+                button.disabled = false;
+                inputField.disabled = false;
+                wizards.forEach(el => el.classList.remove('wizard-disabled'));
+                loadingSpinner.style.display = 'none';
                 return;
             }
 
@@ -125,7 +211,7 @@
                     },
                     body: JSON.stringify({
                         text: userInput,
-                        model: "bert"  // Adjust model if needed
+                        model: selectedModel  // Use selected model
                     }),
                 });
                 
@@ -150,6 +236,12 @@
             } catch (error) {
                 resultContainer.innerHTML = "😢 Can't reach the vibe checker! Make sure the API is running, man!";
             }
+
+            // Re-enable interactions after prediction
+            button.disabled = false;
+            inputField.disabled = false;
+            wizards.forEach(el => el.classList.remove('wizard-disabled'));
+            loadingSpinner.style.display = 'none';
         }
     </script>
 

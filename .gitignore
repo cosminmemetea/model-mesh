@@ -15,9 +15,6 @@ build/
 dist/
 *.egg-info/
 
-# Docker
-*.dockerignore
-
 
 # Logs
 *.log

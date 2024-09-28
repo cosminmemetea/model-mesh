@@ -2,8 +2,10 @@
 FROM python:3.10-slim
 
 # Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1  # Prevent Python from writing .pyc files
-ENV PYTHONUNBUFFERED 1  # Prevent Python output buffering
+ # Prevent Python from writing .pyc files
+ENV PYTHONDONTWRITEBYTECODE=1 
+ # Prevent Python output buffering
+ENV PYTHONUNBUFFERED=1 
 ENV PYTHONPATH=/app 
 
 # Set the working directory inside the container
