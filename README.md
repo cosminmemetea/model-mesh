@@ -24,7 +24,7 @@ The application is deployed as a web service on Render: [Model-Mesh on Render](h
 1. **Clone the Repository**:
 
    ```
-   git clone https://github.com/your-username/model-mesh.git
+   git clone https://github.com/cosminmemetea/model-mesh.git
    cd model-mesh
    ```
 2. **Build the Docker Image**:
@@ -127,6 +127,7 @@ Before starting, ensure you have the following installed:
    ```
    dvc push
    ```
+
 ### 4. DVC Commands Overview
 
 - Track new data: After adding new data files or directories, use:
@@ -151,10 +152,10 @@ Before starting, ensure you have the following installed:
     dvc remote list
     ```
 
-##  5. DVC Files and S3
+###  5. DVC Files and S3
 DVC tracks files by their MD5 hashes for efficient version control. When pushing to S3, files will appear as hashed filenames (e.g., md5/hex/hash), which are mapped to the original filenames in your Git repository. This ensures that no duplicate files are stored and changes are versioned.
 
-## 6. Data Versioning and Sharing
+### 6. Data Versioning and Sharing
 When collaborators clone this repository, they can pull the necessary data using DVC. After setting up DVC and configuring the S3 remote, run:
    ```
    dvc pull
@@ -168,7 +169,7 @@ Add the following DVC files to Git after every change:
    ```
 Never commit large datasets directly to Git; always use DVC to track them.
 
-## 7. Sentiment Analysis Datasets
+### 7. Sentiment Analysis Datasets
 
 Below are the datasets used for this project:
 
@@ -228,3 +229,54 @@ After the Kaggle API is configured, you can download datasets using the followin
    kaggle datasets download -d bittlingmayer/amazonreviews
    unzip amazonreviews.zip -d data/raw/
    ```
+
+### 9. How to Publish Model Mesh on Docker Hub
+
+To publish **Model Mesh** or any Docker image to Docker Hub, follow the steps below:
+
+#### Step 1: Log in to Docker Hub
+Ensure you have a Docker Hub account and are logged in locally.
+
+```
+docker login
+```
+You will be prompted to enter your Docker Hub username and password.
+
+#### Step 2: Build the Docker Image
+Navigate to the root of your **Model Mesh** project and build the Docker image using the following command:
+
+```
+docker build -t model-mesh .
+```
+This command will create a Docker image tagged as `model-mesh`.
+
+#### Step 3: Tag the Image for Docker Hub
+Docker Hub requires a specific format for image tags: `dockerhub-username/repository-name:tag`.
+
+Tag your image with your Docker Hub username and repository name (e.g., `model-mesh`):
+
+```
+docker tag model-mesh your-dockerhub-username/model-mesh:latest
+```
+
+#### Step 4: Push the Image to Docker Hub
+Once tagged, push the image to Docker Hub:
+
+```
+docker push your-dockerhub-username/model-mesh:latest
+```
+This command uploads your Docker image to the Docker Hub repository.
+
+#### Step 5: Make the Image Public (Optional)
+If you want your image to be available for others to pull, make the repository public:
+
+1. Go to [Docker Hub](https://hub.docker.com/) and log in.
+2. Navigate to your profile and select your repository (e.g., `model-mesh`).
+3. Under **Repository Settings**, switch the visibility from **Private** to **Public**.
+
+#### Step 6: Pulling the Image
+You can now pull the image from Docker Hub on any machine with Docker installed using:
+
+```
+docker pull your-dockerhub-username/model-mesh:latest
+```
