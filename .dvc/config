@@ -1,2 +1,5 @@
 [core]
     autostage = true
+    remote = baremetal
+['remote "baremetal"']
+    url = /Volumes/Data
