@@ -72,15 +72,49 @@ The application is deployed as a web service on Render: [Model-Mesh on Render](h
 
 ## Setup Instructions
 
-### 1. Prerequisites
+Prerequisites
 
 Before starting, ensure you have the following installed:
 
-- Python 3.x
+- Python 3.x - https://www.python.org/downloads/release/python-3110/
 - Pip (Python package manager)
 - AWS CLI (for managing AWS resources)
 - DVC (for data version control)
 - AWS account and access to S3
+
+### 1 Steps to Set Python 3.11 as Default with pip
+
+**1. Open Your `.zshrc` (or `.bash_profile` for bash):**
+```
+nano ~/.zshrc   # For zsh users
+```
+
+**2. Add the Path to Python 3.11 at the Top:**
+Add the following line to your `.zshrc` (or/and `.bash_profile`) to make Python 3.11 and its `pip` the default:
+
+```
+export PATH="/usr/local/bin/python3.11:$PATH"
+export PATH="/Library/Frameworks/Python.framework/Versions/3.11/bin:$PATH"
+
+```
+
+If the path to Python 3.11 is different, adjust accordingly.
+
+**3. Reload Your Shell Configuration:**
+After saving the file, reload the configuration:
+
+```
+source ~/.zshrc   # Or/And source ~/.bash_profile
+```
+
+**4. Verify the Default Python and Pip:**
+After reloading the shell, verify that Python 3.11 and its `pip` are being used:
+
+```
+python --version
+pip --version
+```
+
 
 ### 2. AWS S3 Configuration
 
@@ -107,10 +141,22 @@ Before starting, ensure you have the following installed:
 
 1. **Install DVC** with S3 support:
    ```
-   pip install "dvc[s3]"
+   pip install "dvc[s3]" # use gdrive instead of s3 for google drive support
    ```
 
 2. **Initialize DVC in the project: Navigate to your project directory and initialize DVC:**
+
+   Optinally 
+
+   Remove DVC Metadata and Configurations
+   You can remove all DVC metadata by deleting the .dvc/ folder and dvc.yaml file:
+
+   ```   
+   rm -rf .dvc
+   rm dvc.yaml
+   rm .dvcignore
+   ```
+   
    ```
    dvc init
    ```
@@ -122,6 +168,7 @@ Before starting, ensure you have the following installed:
 4. **Configure the S3 remote storage for DVC: Replace your-bucket-name and path/to/folder with your actual S3 bucket name and folder path:**
    ```
    dvc remote add -d s3remote s3://your-bucket-name/path/to/folder
+   dvc remote add -d gdriveremote gdrive://<your-google-drive-folder-id>
    ```
 5. **Push the data to S3: Once you've added data files to DVC, push them to the S3 bucket:**
    ```
@@ -150,6 +197,13 @@ Before starting, ensure you have the following installed:
     ```
     dvc remote list
     ```
+- Unlink Old Remotes
+
+If you have an old DVC remote (like AWS S3), you can remove it by running:
+
+```
+dvc remote remove <remote_name>
+```
 
 ##  5. DVC Files and S3
 DVC tracks files by their MD5 hashes for efficient version control. When pushing to S3, files will appear as hashed filenames (e.g., md5/hex/hash), which are mapped to the original filenames in your Git repository. This ensures that no duplicate files are stored and changes are versioned.
