@@ -1,3 +1,0 @@
-data_source: "s3://your-bucket/path"  # Path to raw data source
-data_path: "data/"                    # Base path for data
-model_path: "models/"                 # Base path for models
