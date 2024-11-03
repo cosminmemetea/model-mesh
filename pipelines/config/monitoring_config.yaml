@@ -1,0 +1,3 @@
+drift_threshold: 0.1
+metrics_to_monitor: ["accuracy", "f1_score"]
+alert_channel: "slack"  # Options: slack, email, webhook

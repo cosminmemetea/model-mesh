@@ -1,0 +1,6 @@
+registry:
+  path: "models/registry/"
+  versioning: true
+metadata:
+  author: "Cosmin Memetea"
+  project: "ModelMesh"

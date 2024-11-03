@@ -1,0 +1,6 @@
+transformations:
+  - type: "scaling"
+    method: "standard"   # Options: standard, minmax, etc.
+  - type: "encoding"
+    method: "one_hot"    # Options: one_hot, label
+selected_features: ["feature1", "feature2", "feature3"]

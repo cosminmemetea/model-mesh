@@ -1,0 +1,102 @@
+stages:
+  ingest_data:
+    cmd: python pipelines/data_ingestion/ingest_raw_data.py
+    deps:
+      - pipelines/data_ingestion/ingest_raw_data.py
+    params:
+      - config/pipeline_config.yaml:data_source
+    outs:
+      - data/raw
+
+  data_validation:
+    cmd: python pipelines/data_ingestion/data_validation.py
+    deps:
+      - data/raw
+    outs:
+      - data/validated
+
+  preprocess_data:
+    cmd: python pipelines/data_ingestion/data_preprocessing.py
+    deps:
+      - data/validated
+    outs:
+      - data/processed
+
+  feature_engineering:
+    cmd: python pipelines/feature_engineering/feature_transformations.py
+    deps:
+      - data/processed
+    params:
+      - config/feature_config.yaml:transformations
+      - config/feature_config.yaml:selected_features
+    outs:
+      - data/features
+
+  hyperparameter_tuning:
+    cmd: python pipelines/model_training/hyperparameter_tuning.py
+    deps:
+      - data/features
+    params:
+      - config/hyperparams.yaml:model
+      - config/hyperparams.yaml:grid_search
+    outs:
+      - models/tuned_model.pkl
+
+  train_model:
+    cmd: python pipelines/model_training/train_model.py
+    deps:
+      - models/tuned_model.pkl
+      - data/features
+    params:
+      - config/model_config.yaml:model_type
+      - config/model_config.yaml:layers
+      - config/model_config.yaml:optimizer
+      - config/model_config.yaml:loss_function
+    outs:
+      - models/model.pkl
+
+  evaluate_model:
+    cmd: python pipelines/model_evaluation/evaluate_model.py
+    deps:
+      - models/model.pkl
+      - data/test
+    metrics:
+      - metrics.json
+
+  model_selection:
+    cmd: python pipelines/model_evaluation/model_selection.py
+    deps:
+      - models/model_a.pkl
+      - models/model_b.pkl
+    metrics:
+      - metrics.json
+    outs:
+      - models/best_model.pkl
+
+  model_registry:
+    cmd: python pipelines/model_serving/register_model.py
+    deps:
+      - models/best_model.pkl
+    params:
+      - config/registry_config.yaml:registry
+      - config/registry_config.yaml:metadata
+    outs:
+      - models/registry/best_model_v1.pkl
+
+  feedback_loop:
+    cmd: python pipelines/feedback_loop/collect_feedback.py
+    deps:
+      - models/registry/best_model_v1.pkl
+    outs:
+      - data/feedback
+
+  data_drift_monitoring:
+    cmd: python pipelines/model_evaluation/monitoring.py
+    deps:
+      - data/feedback
+    params:
+      - config/monitoring_config.yaml:drift_threshold
+      - config/monitoring_config.yaml:metrics_to_monitor
+      - config/monitoring_config.yaml:alert_channel
+    metrics:
+      - drift_metrics.json
