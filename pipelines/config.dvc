@@ -1,0 +1,6 @@
+outs:
+- md5: 996f849ae20cfcb576e8ce520d1b458c.dir
+  size: 969
+  nfiles: 6
+  hash: md5
+  path: config
