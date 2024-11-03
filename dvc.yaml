@@ -4,7 +4,7 @@ stages:
     deps:
       - pipelines/data_ingestion/ingest_raw_data.py
     params:
-      - config/pipeline_config.yaml:data_source
+      - pipelines/config/pipeline_config.yaml:data_source
     outs:
       - data/raw
 
@@ -27,8 +27,8 @@ stages:
     deps:
       - data/processed
     params:
-      - config/feature_config.yaml:transformations
-      - config/feature_config.yaml:selected_features
+      - pipelines/config/feature_config.yaml:transformations
+      - pipelines/config/feature_config.yaml:selected_features
     outs:
       - data/features
 
@@ -37,66 +37,59 @@ stages:
     deps:
       - data/features
     params:
-      - config/hyperparams.yaml:model
-      - config/hyperparams.yaml:grid_search
+      - pipelines/config/hyperparams.yaml:model
+      - pipelines/config/hyperparams.yaml:grid_search
     outs:
-      - models/tuned_model.pkl
+      - data/models/tuned_model.pkl
 
   train_model:
     cmd: python pipelines/model_training/train_model.py
     deps:
-      - models/tuned_model.pkl
+      - data/models/tuned_model.pkl
       - data/features
     params:
-      - config/model_config.yaml:model_type
-      - config/model_config.yaml:layers
-      - config/model_config.yaml:optimizer
-      - config/model_config.yaml:loss_function
+      - pipelines/config/model_config.yaml:model_type
+      - pipelines/config/model_config.yaml:layers
+      - pipelines/config/model_config.yaml:optimizer
+      - pipelines/config/model_config.yaml:loss_function
     outs:
-      - models/model.pkl
+      - data/models/latest_model.pkl
 
   evaluate_model:
     cmd: python pipelines/model_evaluation/evaluate_model.py
     deps:
-      - models/model.pkl
+      - data/models/latest_model.pkl
       - data/test
     metrics:
       - metrics.json
 
-  model_selection:
-    cmd: python pipelines/model_evaluation/model_selection.py
+  interpretability_analysis:
+    cmd: python pipelines/interpretability_pipeline.py
     deps:
-      - models/model_a.pkl
-      - models/model_b.pkl
-    metrics:
-      - metrics.json
+      - data/models/latest_model.pkl
+      - data/test
+    params:
+      - pipelines/config/monitoring_config.yaml:metrics_to_monitor
     outs:
-      - models/best_model.pkl
+      - results/interpretability
+
+  adversarial_testing:
+    cmd: python pipelines/adversarial_testing.py
+    deps:
+      - data/models/latest_model.pkl
+      - data/adversarial_samples
+    params:
+      - pipelines/config/monitoring_config.yaml:drift_threshold
+      - pipelines/config/monitoring_config.yaml:alert_channel
+    metrics:
+      - metrics/adversarial_metrics.json
 
   model_registry:
     cmd: python pipelines/model_serving/register_model.py
     deps:
-      - models/best_model.pkl
+      - data/models/latest_model.pkl
     params:
-      - config/registry_config.yaml:registry
-      - config/registry_config.yaml:metadata
+      - pipelines/config/registry_config.yaml:registry
+      - pipelines/config/registry_config.yaml:metadata
     outs:
-      - models/registry/best_model_v1.pkl
-
-  feedback_loop:
-    cmd: python pipelines/feedback_loop/collect_feedback.py
-    deps:
-      - models/registry/best_model_v1.pkl
-    outs:
-      - data/feedback
-
-  data_drift_monitoring:
-    cmd: python pipelines/model_evaluation/monitoring.py
-    deps:
-      - data/feedback
-    params:
-      - config/monitoring_config.yaml:drift_threshold
-      - config/monitoring_config.yaml:metrics_to_monitor
-      - config/monitoring_config.yaml:alert_channel
-    metrics:
-      - drift_metrics.json
+      - data/models/registry/best_model_v1.pkl
