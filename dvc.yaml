@@ -40,12 +40,12 @@ stages:
       - pipelines/config/hyperparams.yaml:model
       - pipelines/config/hyperparams.yaml:grid_search
     outs:
-      - data/models/tuned_model.pkl
+      - data/models/tuning/tuned_model.pkl  # Separate directory for tuned model
 
   train_model:
     cmd: python pipelines/model_training/train_model.py
     deps:
-      - data/models/tuned_model.pkl
+      - data/models/tuning/tuned_model.pkl
       - data/features
     params:
       - pipelines/config/model_config.yaml:model_type
@@ -53,43 +53,43 @@ stages:
       - pipelines/config/model_config.yaml:optimizer
       - pipelines/config/model_config.yaml:loss_function
     outs:
-      - data/models/latest_model.pkl
+      - data/models/final/latest_model.pkl  # Separate directory for final model
 
   evaluate_model:
     cmd: python pipelines/model_evaluation/evaluate_model.py
     deps:
-      - data/models/latest_model.pkl
+      - data/models/final/latest_model.pkl
       - data/test
     metrics:
-      - metrics.json
+      - metrics/evaluate_metrics.json  # Unique metrics file for evaluation
 
   interpretability_analysis:
     cmd: python pipelines/interpretability_pipeline.py
     deps:
-      - data/models/latest_model.pkl
+      - data/models/final/latest_model.pkl
       - data/test
     params:
       - pipelines/config/monitoring_config.yaml:metrics_to_monitor
     outs:
-      - results/interpretability
+      - results/interpretability  # Directory for interpretability results
 
   adversarial_testing:
     cmd: python pipelines/adversarial_testing.py
     deps:
-      - data/models/latest_model.pkl
+      - data/models/final/latest_model.pkl
       - data/adversarial_samples
     params:
       - pipelines/config/monitoring_config.yaml:drift_threshold
       - pipelines/config/monitoring_config.yaml:alert_channel
     metrics:
-      - metrics/adversarial_metrics.json
+      - metrics/adversarial_metrics.json  # Unique metrics file for adversarial testing
 
   model_registry:
     cmd: python pipelines/model_serving/register_model.py
     deps:
-      - data/models/latest_model.pkl
+      - data/models/final/latest_model.pkl
     params:
       - pipelines/config/registry_config.yaml:registry
       - pipelines/config/registry_config.yaml:metadata
     outs:
-      - data/models/registry/best_model_v1.pkl
+      - data/models/registry/best_model_v1.pkl  # Directory for model registry
