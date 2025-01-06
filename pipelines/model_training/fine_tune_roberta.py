@@ -33,6 +33,7 @@ def plot_metrics(metrics, output_dir):
 
     # Add labels, title, and legend
     plt.xlabel('Epochs')
+    plt.xticks(epochs)  # Ensure only integer ticks for epochs
     plt.ylabel('Metrics')
     plt.title('Model Performance Over Epochs')
     plt.legend()
@@ -115,19 +116,19 @@ def fine_tune_cardiff_roberta():
         compute_metrics=compute_metrics
     )
 
-    # Train the model
-    trainer.train()
+    # Train the model and collect metrics dynamically
+    for epoch in range(training_args.num_train_epochs):
+        print(f"Training epoch {epoch + 1}")
+        trainer.train()  # Train for one epoch
+        eval_results = trainer.evaluate()  # Evaluate after epoch
+        metrics["epochs"].append(epoch + 1)  # Append epoch number
+        metrics["accuracy"].append(eval_results["eval_accuracy"])  # Append accuracy
+        metrics["f1"].append(eval_results["eval_f1"])  # Append F1 score
 
-    # Evaluate and collect predictions
+    # Final evaluation to collect predictions and labels
     predictions = trainer.predict(tokenized_datasets["validation"])
-    eval_metrics = predictions.metrics
     pred_labels = predictions.predictions.argmax(axis=-1)
     true_labels = predictions.label_ids
-
-    # Collect metrics
-    metrics["epochs"].append(1)  # Example with 1 epoch; modify dynamically if needed
-    metrics["accuracy"].append(eval_metrics["test_accuracy"])
-    metrics["f1"].append(eval_metrics["test_f1"])
 
     # Save the model and tokenizer
     trainer.save_model(output_dir)
