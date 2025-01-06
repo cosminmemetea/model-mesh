@@ -1,11 +1,13 @@
-from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments
+from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     predictions = logits.argmax(axis=-1)
-    precision, recall, f1, _ = precision_recall_fscore_support(labels, predictions, average="weighted")
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        labels, predictions, average="weighted", zero_division=0
+    )
     acc = accuracy_score(labels, predictions)
     return {"accuracy": acc, "f1": f1, "precision": precision, "recall": recall}
 
@@ -27,18 +29,23 @@ def fine_tune_cardiff_roberta():
 
     # Preprocess dataset
     def preprocess(batch):
-        return tokenizer(batch["text"], padding="max_length", truncation=True)
+        return tokenizer(batch["text"], padding="max_length", truncation=True, max_length=128)
 
     tokenized_datasets = dataset.map(preprocess, batched=True)
+
+    # Define data collator (handles padding dynamically)
+    data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     # Define training arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
-        evaluation_strategy="epoch",
+        eval_strategy="epoch",  # Updated from evaluation_strategy
         save_strategy="epoch",
         num_train_epochs=3,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
+        learning_rate=5e-5,  # Lower learning rate for fine-tuning
+        weight_decay=0.01,  # Add regularization to prevent overfitting
         logging_dir=f"{output_dir}/logs",
         logging_steps=10,
         save_total_limit=2,
@@ -53,7 +60,7 @@ def fine_tune_cardiff_roberta():
         args=training_args,
         train_dataset=tokenized_datasets["train"],
         eval_dataset=tokenized_datasets["validation"],
-        tokenizer=tokenizer,
+        data_collator=data_collator,
         compute_metrics=compute_metrics
     )
 
