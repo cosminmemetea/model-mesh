@@ -1,4 +1,4 @@
-from transformers import RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
+from transformers import AdamW, RobertaTokenizer, RobertaForSequenceClassification, Trainer, TrainingArguments, DataCollatorWithPadding
 from datasets import load_dataset
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
@@ -92,11 +92,11 @@ def fine_tune_cardiff_roberta():
         output_dir=output_dir,
         eval_strategy="epoch",
         save_strategy="epoch",
-        num_train_epochs=3,
+        num_train_epochs=5,
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
-        learning_rate=5e-5,
-        weight_decay=0.01,
+        learning_rate=3e-5,
+        weight_decay=0.1,
         logging_dir=f"{output_dir}/logs",
         logging_steps=10,
         save_total_limit=2,
@@ -107,13 +107,23 @@ def fine_tune_cardiff_roberta():
 
     metrics = {"epochs": [], "accuracy": [], "f1": []}
 
+    optimizer_grouped_parameters = [
+        {"params": model.roberta.embeddings.parameters(), "lr": 1e-5},
+        {"params": model.roberta.encoder.layer[:6].parameters(), "lr": 2e-5},
+        {"params": model.roberta.encoder.layer[6:].parameters(), "lr": 3e-5},
+        {"params": model.classifier.parameters(), "lr": 3e-5},
+    ]
+
+    optimizer = AdamW(optimizer_grouped_parameters)
+
     trainer = Trainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_datasets["train"],
         eval_dataset=tokenized_datasets["validation"],
         data_collator=data_collator,
-        compute_metrics=compute_metrics
+        compute_metrics=compute_metrics,
+        optimizers=(optimizer, None)  # Use RAdam
     )
 
     # Train the model and collect metrics dynamically
